@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ยูโน่ ไนท์</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg1:#0f4d3a;--bg2:#06241c;--ink:#f6f3e9;--mute:#a9c7ba;--panel:rgba(0,0,0,.35);--gold:#ffd24a;
+--r:#e5393b;--y:#f4b400;--g:#2e9d4f;--b:#1e6fd9}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:'Prompt','Noto Sans Thai','Sarabun',system-ui,sans-serif;color:var(--ink);background:radial-gradient(ellipse at 50% 35%,var(--bg1),var(--bg2));font-size:16px;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer}
+#app{max-width:900px;margin:0 auto;padding:10px 12px 16px;min-height:100%;display:flex;flex-direction:column;gap:10px}
+h1{font-size:30px;margin:6px 0 0;text-align:center;font-weight:800;letter-spacing:.5px}
+.sub{text-align:center;color:var(--mute);margin:0 0 6px}
+.panel{background:var(--panel);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px}
+.row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.row input{flex:1;min-width:0;font:inherit;font-size:17px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:var(--ink)}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-size:17px;font-weight:700;background:var(--gold);color:#3a2a00}
+.btn.ghost{background:rgba(255,255,255,.12);color:var(--ink)}
+.btn.sm{padding:9px 12px;font-size:15px;min-width:76px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}.seg .btn{flex:1 1 28%;padding:10px 6px}
+.seg .btn.on{background:var(--gold);color:#3a2a00}.seg .btn:not(.on){background:rgba(255,255,255,.12);color:var(--ink)}
+details{color:var(--mute);margin-top:10px;line-height:1.7}summary{cursor:pointer;color:var(--ink);font-weight:500}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.score{font-size:14px;color:var(--mute)}
+.opps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.opp{background:var(--panel);border:2px solid transparent;border-radius:14px;padding:8px 12px;min-width:92px;text-align:center;transition:.2s}
+.opp.act{border-color:var(--gold);box-shadow:0 0 18px rgba(255,210,74,.5)}
+.opp b{display:block;font-size:15px;font-weight:600}
+.opp span{font-size:22px;font-weight:800}
+.opp small{color:var(--mute)}
+.table{display:flex;justify-content:center;align-items:center;gap:22px;padding:14px 0;flex-wrap:wrap}
+.ind{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 14px currentColor}
+.msg{text-align:center;min-height:48px;font-size:17px;font-weight:500;padding:6px 10px;background:var(--panel);border-radius:12px}
+.hand{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 0;margin-top:auto}
+.card{position:relative;width:64px;height:96px;border-radius:10px;border:3px solid #fff;display:inline-block;flex:none;user-select:none;box-shadow:0 3px 8px rgba(0,0,0,.45);transition:transform .15s}
+.card.r{background:var(--r)}.card.y{background:var(--y)}.card.g{background:var(--g)}.card.b{background:var(--b)}
+.card.k{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--g) 0 75%,var(--y) 0)}
+.card .oval{position:absolute;inset:14px 5px;background:#fff;border-radius:50%;transform:rotate(-24deg);display:flex;align-items:center;justify-content:center}
+.card .oval b{transform:rotate(24deg);font-size:25px;font-weight:800;color:#222}
+.card.r .oval b{color:var(--r)}.card.y .oval b{color:#c78f00}.card.g .oval b{color:var(--g)}.card.b .oval b{color:var(--b)}
+.card .cn{position:absolute;color:#fff;font-weight:800;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.card .tl{top:3px;left:5px}.card .br{bottom:3px;right:5px;transform:rotate(180deg)}
+.card .u{text-decoration:underline}
+.card.back{background:#1a1a1a;border-color:#fff}
+.card.back::after{content:'UNO';position:absolute;inset:22px 4px;background:#d62828;border-radius:50%;transform:rotate(-24deg);display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:800;font-size:16px}
+.hand .card.ok{cursor:pointer;transform:translateY(-10px);box-shadow:0 8px 14px rgba(0,0,0,.5),0 0 0 2px var(--gold)}
+.hand .card.no{filter:brightness(.55)}
+.hand .card.ok:hover{transform:translateY(-16px)}
+.deck{cursor:pointer}.deck:hover{transform:translateY(-3px)}
+.acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.uno{background:#d62828;color:#fff}.uno.on{background:var(--gold);color:#3a2a00;box-shadow:0 0 16px var(--gold)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.box{background:#12382d;border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:22px;text-align:center;max-width:360px;width:100%}
+.box h2{margin:0 0 10px;font-size:24px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.cols button{height:64px;border:3px solid #fff;border-radius:16px}
+@media (min-width:600px){.card{width:78px;height:116px}.card .oval b{font-size:30px}.card .oval{inset:17px 6px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const CN={r:'แดง',y:'เหลือง',g:'เขียว',b:'น้ำเงิน'},HEX={r:'#e5393b',y:'#f4b400',g:'#2e9d4f',b:'#1e6fd9'};
+const SYM={S:'⊘',R:'⇄',D:'+2',W:'★',F:'+4'};
+let cfg=[{n:'คุณ',bot:false},{n:'บอท 1',bot:true},{n:'บอท 2',bot:true},{n:'บอท 3',bot:true},{n:'บอท 4',bot:true},{n:'บอท 5',bot:true},{n:'บอท 6',bot:true}],cnt=3,multi=true,G=null,wins={};
+const $=s=>document.querySelector(s),app=$('#app');
+const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function mk(){const d=[];for(const c of'rygb'){d.push({c,v:'0'});for(let i=1;i<=9;i++)d.push({c,v:''+i},{c,v:''+i});for(const v of'SRD')d.push({c,v},{c,v})}for(let i=0;i<4;i++)d.push({c:'k',v:'W'},{c:'k',v:'F'});return sh(d)}
+const tc=()=>G.disc[G.disc.length-1];
+function draw1(){if(!G.deck.length){const t=G.disc.pop();G.deck=sh(G.disc);G.disc=[t]}return G.deck.pop()||null}
+function give(i,n){for(let k=0;k<n;k++){const c=draw1();if(c)G.P[i].h.push(c)}}
+function ok(p,c){if(c.v==='F')return!p.h.some(x=>x.c===G.col);if(c.c==='k')return true;return c.c===G.col||c.v===tc().v}
+const humans=()=>G.P.filter(p=>!p.bot).length;
+function el(c,cls=''){const d=document.createElement('div');if(!c){d.className='card back '+cls;return d}
+const s=SYM[c.v]||c.v,u=(c.v==='6'||c.v==='9')?' u':'';
+d.className='card '+c.c+' '+cls;d.innerHTML=`<span class="cn tl${u}">${s}</span><span class="oval"><b class="${u}">${s}</b></span><span class="cn br${u}">${s}</span>`;return d}
+
+function setup(){
+app.innerHTML=`<h1>🃏 ยูโน่ ไนท์</h1><p class="sub">เกมไพ่สำหรับเล่นกับเพื่อนในกลุ่มเล็ก 2–7 คน</p>
+<div class="panel"><b>จำนวนผู้เล่น</b><div class="seg row" id="cnt"></div><div id="seats"></div>
+<p class="sub" style="text-align:left;margin-top:8px">เลือก "คน" หลายที่นั่งเพื่อส่งเครื่องต่อกันเล่น หรือปล่อยเป็น "บอท" เพื่อเล่นคนเดียว</p>
+<button class="btn ghost" style="width:100%;margin-top:6px" id="mu">ลงไพ่ใบเดียวกันหลายใบ: ${multi?'เปิด ✓':'ปิด'}</button><button class="btn" style="width:100%;margin-top:8px" id="go">เริ่มเกม (เครื่องเดียว / บอท)</button><button class="btn ghost" style="width:100%;margin-top:8px" id="on">🌐 เล่นออนไลน์กับเพื่อน (คนละเครื่อง)</button>
+<details><summary>กติกา</summary>
+• แจกไพ่คนละ 7 ใบ ใครหมดมือก่อนชนะ<br>• ลงไพ่ที่ตรงสีหรือตรงเลข/สัญลักษณ์กับใบบนกอง<br>• ⊘ ข้ามตา · ⇄ กลับทิศ (2 คน = ข้ามตา) · +2 คนถัดไปจั่ว 2 ใบและโดนข้าม<br>• ★ เปลี่ยนสี · +4 เปลี่ยนสี คนถัดไปจั่ว 4 ใบ (ลงได้เมื่อไม่มีไพ่สีปัจจุบันในมือ)<br>• ลงไพ่ไม่ได้ให้จั่ว 1 ใบ ถ้าลงได้จะลงต่อหรือข้ามก็ได้<br>• ลงไพ่เลขหรือสัญลักษณ์เดียวกันได้หลายใบในตาเดียว (กติกาบ้านยอดนิยม กติกาทางการลงได้ใบเดียว ปิดได้ที่ปุ่มก่อนเริ่มเกม) ผลรวมกัน เช่น +2 สองใบ = จั่ว 4 · กด “จบตา” เมื่อไม่ต้องการลงต่อ<br>• เหลือไพ่ใบสุดท้าย ต้องกดปุ่ม UNO! ก่อนลง ไม่งั้นโดนจั่ว 2 ใบ</details></div>`;
+const cc=$('#cnt');[2,3,4,5,6,7].forEach(n=>{const b=document.createElement('button');b.className='btn'+(cnt===n?' on':'');b.textContent=n+' คน';b.onclick=()=>{cnt=n;setup()};cc.append(b)});
+const st=$('#seats');cfg.slice(0,cnt).forEach((s,i)=>{const r=document.createElement('div');r.className='row';
+r.innerHTML=`<input maxlength="12" value="${s.n}" aria-label="ชื่อ"><button class="btn sm ghost">${s.bot?'🤖 บอท':'🙂 คน'}</button>`;
+r.children[0].oninput=e=>s.n=e.target.value;r.children[1].onclick=()=>{s.bot=!s.bot;if(s.bot&&/^คน/.test(s.n))s.n='บอท '+i;setup()};st.append(r)});
+$('#go').onclick=()=>{if(cfg.slice(0,cnt).every(s=>s.bot))cfg[0].bot=false;newGame()};$('#on').onclick=()=>lobby();$('#mu').onclick=()=>{multi=!multi;setup()}}
+
+function newGame(P0){
+const P=P0||cfg.slice(0,cnt).map((s,i)=>({name:(s.n||'ผู้เล่น '+(i+1)).trim(),bot:s.bot,h:[]}));
+G={P,deck:mk(),disc:[],cur:0,dir:1,col:'r',drawn:null,uno:false,hid:false,msg:'เริ่มเกม!',over:null,pick:null,busy:false,chain:null,acc:null,pend:0,ep:(G&&G.ep)||0,multi};
+P.forEach(p=>wins[p.name]=wins[p.name]||0);
+P.forEach((_,i)=>give(i,7));
+let t;do{t=draw1();if(!/^\d$/.test(t.v))G.deck.unshift(t)}while(!/^\d$/.test(t.v));
+G.disc.push(t);G.col=t.c;G.deck=sh(G.deck);if(P0)Object.assign(G,{online:1,host:1,me:Math.max(0,P.findIndex(p=>p.peer===myPeer()))});begin()}
+
+function begin(){const p=G.P[G.cur];G.hid=!G.online&&!p.bot&&humans()>1;render();if(p.bot){G.busy=true;setTimeout(botTurn,1000)}}
+function advance(n){if(G.online&&!G.host)return;G.pend=0;G.cur=((G.cur+G.dir*n)%G.P.length+G.P.length)%G.P.length;G.drawn=null;G.uno=false;G.busy=false;G.chain=null;G.acc=null;begin()}
+function nextIdx(){return((G.cur+G.dir)%G.P.length+G.P.length)%G.P.length}
+
+function okc(p,c){return G.chain?(c.c!=='k'&&c.v===G.chain):ok(p,c)}
+function play(ci,color){const p=G.P[G.cur],c=p.h.splice(ci,1)[0];G.disc.push(c);G.drawn=null;G.col=c.c==='k'?color:c.c;
+const a=G.acc||(G.acc={m:[],n:0,v:c.v});a.n++;a.v=c.v;
+a.m.push(c.c==='k'?(c.v==='F'?'+4':'เปลี่ยนสี')+' → '+CN[color]:CN[c.c]+' '+(SYM[c.v]||c.v));
+if(!p.h.length){G.acc=null;G.chain=null;G.msg=p.name+' ลงใบสุดท้าย!';win(G.cur);return}
+if(G.multi&&c.c!=='k'&&p.h.some(x=>x.c!=='k'&&x.v===c.v)){G.chain=c.v;
+if(p.bot){G.busy=true;G.msg=p.name+' ลง '+a.m.join(' + ');render();setTimeout(botChain,800)}
+else{G.busy=false;G.msg=p.name+' ลง '+a.m.join(' + ')+' — ลงใบเลขเดียวกันต่อ หรือกด “จบตา”';render()}
+return}
+fin()}
+function botChain(){if(G.online&&!G.host)return;const p=G.P[G.cur],i=p.h.findIndex(x=>x.c!=='k'&&x.v===G.chain);if(i<0)fin();else play(i)}
+function fin(){const p=G.P[G.cur],a=G.acc,N=G.P.length;let m=p.name+' ลง '+a.m.join(' + '),skip=1;G.chain=null;G.acc=null;
+if(p.h.length===1){if(p.bot||G.uno)m+=' · UNO! 🔔';else{give(G.cur,2);m+=' · ลืมร้อง UNO! โดนจั่ว 2 ใบ'}}
+if(a.v==='S'){skip=1+a.n;m+=' · ข้ามตา'}
+if(a.v==='R'){if(N===2){skip=1+a.n;m+=' · ข้ามตา'}else{if(a.n%2)G.dir*=-1;m+=' · กลับทิศ'}}
+if(a.v==='D'){const v=nextIdx();give(v,2*a.n);skip=2;m+=` · ${G.P[v].name} จั่ว ${2*a.n}`}
+if(a.v==='F'){const v=nextIdx();give(v,4);skip=2;m+=` · ${G.P[v].name} จั่ว 4`}
+G.msg=m;G.busy=true;G.pend=skip;render();setTimeout(()=>advance(skip),p.bot?900:500)}
+
+function botTurn(){if(G.online&&!G.host)return;if(G.chain)return botChain();const p=G.P[G.cur];let o=p.h.map((_,i)=>i).filter(i=>ok(p,p.h[i]));
+if(!o.length){const c=draw1();if(c){p.h.push(c);if(ok(p,c))o=[p.h.length-1]}}
+if(!o.length){G.msg=p.name+' จั่วแล้วข้ามตา';G.pend=1;render();setTimeout(()=>advance(1),900);return}
+const sc=c=>c.v==='F'?-1:c.c==='k'?0:/^\d$/.test(c.v)?1:2;
+o.sort((a,b)=>sc(p.h[b])-sc(p.h[a])+(Math.random()-.5));
+const i=o[0],c=p.h[i];let col=G.col;
+if(c.c==='k'){const n={r:0,y:0,g:0,b:0};p.h.forEach(x=>{if(x.c!=='k')n[x.c]++});col=Object.keys(n).sort((a,b)=>n[b]-n[a])[0]}
+play(i,col)}
+
+function win(i){wins[G.P[i].name]++;G.over=i;render()}
+
+function hClick(i){const p=G.P[G.cur];if(p.bot||G.busy||G.hid||G.over!=null||(G.online&&G.cur!==G.me))return;const c=p.h[i];
+if(G.drawn&&G.drawn!==c)return;if(!okc(p,c))return;
+if(c.c==='k'){G.pick=i;render()}else doPlay(i)}
+function dClick(rm){const p=G.P[G.cur];if(p.bot||G.busy||G.hid||G.drawn||G.chain||G.over!=null)return;if(G.online&&!rm){if(G.cur!==G.me)return;if(!G.host){G.busy=true;room.emit('act',{t:'d'});render();return}}
+const c=draw1();if(!c){G.msg='กองจั่วหมด';render();return}p.h.push(c);
+if(ok(p,c)){G.drawn=c;G.msg='จั่วได้ไพ่ที่ลงได้ — ลงเลยหรือกด "ข้ามตา"'}else{G.msg='จั่วแล้วลงไม่ได้ ข้ามตา';G.busy=true;G.pend=1;render();setTimeout(()=>advance(1),1000);return}render()}
+
+function render(){
+const hv=G.P.findIndex((p,i)=>i===G.cur&&!p.bot);const vi=G.online?G.me:(hv>=0?hv:G.P.findIndex(p=>!p.bot));const me=G.P[vi],isTurn=G.cur===vi&&!G.busy&&G.over==null;
+app.innerHTML='';if(G.online&&G.host)bcast();
+const t=document.createElement('div');t.className='top';t.innerHTML=`<b>🃏 ยูโน่ ไนท์</b><span class="score">${Object.entries(wins).filter(([n])=>G.P.some(p=>p.name===n)).map(([n,w])=>n+' '+w).join(' · ')}</span><button class="btn sm ghost">ออก</button>`;
+t.lastChild.onclick=()=>{if(confirm('กลับหน้าตั้งค่า?'))leave()};app.append(t);
+const o=document.createElement('div');o.className='opps';
+G.P.forEach((p,i)=>{if(i===vi)return;const d=document.createElement('div');d.className='opp'+(i===G.cur?' act':'');d.innerHTML=`<b>${p.bot?'🤖':'🙂'} ${p.name}</b><span>${p.h.length}</span> <small>ใบ</small>`;o.append(d)});app.append(o);
+const tb=document.createElement('div');tb.className='table';
+const dk=el(null,'deck');dk.onclick=()=>dClick();dk.title='จั่วไพ่';tb.append(dk);
+const tp=el(tc());tb.append(tp);
+const ind=document.createElement('div');ind.style.cssText=`text-align:center;color:${HEX[G.col]}`;ind.innerHTML=`<div class="ind" style="background:${HEX[G.col]};margin:0 auto 4px"></div><b style="color:var(--ink)">สี${CN[G.col]}</b><div style="color:var(--mute);font-size:14px">${G.dir>0?'↻ ตามเข็ม':'↺ ทวนเข็ม'}</div>`;tb.append(ind);app.append(tb);
+const m=document.createElement('div');m.className='msg';m.textContent=G.over!=null?'จบเกม':(G.cur===vi&&!G.hid?'ตาของคุณ — '+G.msg:G.msg+(G.P[G.cur].bot?' (ตา '+G.P[G.cur].name+')':''));app.append(m);
+const a=document.createElement('div');a.className='acts';
+if(isTurn&&me.h.length>1){const u=document.createElement('button');u.className='btn uno'+(G.uno?' on':'');u.textContent=G.uno?'UNO! พร้อมแล้ว ✓':'UNO!';u.onclick=()=>{G.uno=!G.uno;render()};a.append(u)}
+if(isTurn&&(G.drawn||G.chain)){const s=document.createElement('button');s.className='btn ghost';s.textContent=G.chain?'จบตา':'ข้ามตา';s.onclick=doPass;a.append(s)}
+app.append(a);
+const h=document.createElement('div');h.className='hand';
+if(!G.hid&&me){me.h.forEach((c,i)=>{const pl=isTurn&&okc(me,c)&&(!G.drawn||G.drawn===c);const d=el(c,pl?'ok':(isTurn?'no':''));d.onclick=()=>hClick(i);h.append(d)})}app.append(h);
+if(G.hid&&G.over==null)modal(`<h2>ส่งเครื่องให้ ${G.P[G.cur].name}</h2><p>อย่าเพิ่งแอบดูไพ่คนอื่นนะ 😉</p><button class="btn" id="rdy">พร้อมแล้ว</button>`,()=>{G.hid=false;render()});
+if(G.pick!=null)modal(`<h2>เลือกสี</h2><div class="cols">${[...'rygb'].map(c=>`<button data-c="${c}" style="background:${HEX[c]};color:#fff;font:700 18px Prompt,sans-serif">${CN[c]}</button>`).join('')}</div>`,null,e=>{const c=e.target.dataset.c;if(c){const i=G.pick;G.pick=null;doPlay(i,c)}});
+if(G.over!=null)modal(`<h2>🎉 ${G.P[G.over].name} ชนะ!</h2><p>ไพ่หมดมือแล้ว</p><div class="acts">${G.online&&!G.host?'<p>รอเจ้าของห้องเริ่มรอบใหม่…</p>':'<button class="btn" id="rdy">เล่นอีกรอบ</button>'}<button class="btn ghost" id="bk">ตั้งค่า</button></div>`,G.online?newOnline:newGame,null,G.online?leave:setup)}
+function modal(html,onrdy,onclick,onbk){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="box">${html}</div>`;
+const r=d.querySelector('#rdy');if(r&&onrdy)r.onclick=onrdy;const b=d.querySelector('#bk');if(b&&onbk)b.onclick=onbk;if(onclick)d.onclick=onclick;app.append(d)}
+let room=null,isHost=false,tm=null,rc='',botsN=0,ready=false,p2p=false,wantHost=false,named=false;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const enc=c=>c.c+c.v,dec=s=>({c:s[0],v:s.slice(1)});
+const myPeer=()=>{const p=room&&room.peers().find(x=>x.isMe&&x.sameTab);return p&&p.peer};
+const seats=()=>room.peers().filter(p=>p.kind==='viewer').sort((a,b)=>(b.presence.host?1:0)-(a.presence.host?1:0)||(a.peer<b.peer?-1:1));
+function leave(){clearInterval(tm);if(room){room.leave();room=null}G=null;isHost=false;setup()}
+function doPlay(i,col){if(G.online&&!G.host){G.busy=true;room.emit('act',{t:'p',i,c:col,u:G.uno?1:0});render()}else play(i,col)}
+function doPass(){if(G.online&&!G.host){G.busy=true;room.emit('act',{t:'s'});render()}else if(G.chain)fin();else{G.busy=true;advance(1)}}
+let hostPeer=null;
+function bcast(){if(!room||!G)return;room.emit('st',{ep:G.ep||0,mu:G.multi?1:0,pr:G.P.map(p=>p.peer||''),bt:G.P.map(p=>p.bot?1:0),n:G.P.map(p=>p.name),h:G.P.map(p=>p.h.map(enc)),dk:G.deck.map(enc),dc:G.disc.map(enc),col:G.col,d:G.dir,cur:G.cur,m:String(G.msg).slice(0,140),o:G.over,wn:G.P.map(p=>wins[p.name]||0),dr:G.drawn?G.P[G.cur].h.indexOf(G.drawn):-1,b:G.busy?1:0,ch:G.chain||null,pa:G.pend||0,ac:G.acc?{m:G.acc.m,n:G.acc.n,v:G.acc.v}:null})}
+function onSt(m){const d=m.data;if(m.isMe||!d||!d.pr)return;
+if(isHost){if(!(d.ep>(G&&G.ep||0)))return;isHost=false}else if(G&&d.ep<(G.ep||0))return;
+const me=d.pr.indexOf(myPeer());if(me<0)return;hostPeer=m.peer;
+const ku=G&&G.online&&d.cur===me&&G.cur===me?G.uno:false,kp=G&&G.pick!=null&&d.cur===me?G.pick:null;
+G={online:1,host:0,me,ep:d.ep,multi:!!d.mu,P:d.n.map((n,i)=>({name:n,bot:!!d.bt[i],peer:d.pr[i]||undefined,h:d.h[i].map(dec)})),disc:d.dc.map(dec),deck:d.dk.map(dec),col:d.col,dir:d.d,cur:d.cur,msg:d.m,over:d.o,busy:!!d.b,hid:false,pick:kp,uno:ku,drawn:null,chain:d.ch,pend:d.pa,acc:d.ac};
+if(d.dr>=0)G.drawn=G.P[d.cur].h[d.dr];d.n.forEach((n,i)=>wins[n]=d.wn[i]);render()}
+function onAct(m){if(!isHost||m.isMe||!G||G.over!=null||G.busy)return;const p=G.P[G.cur],d=m.data||{};if(!p||p.bot||p.peer!==m.peer)return;
+if(d.t==='p'){const c=p.h[d.i];if(!c||(G.drawn&&G.drawn!==c)||!okc(p,c))return;G.uno=!!d.u;if(c.c==='k'){if(!CN[d.c])return;play(d.i,d.c)}else play(d.i)}
+else if(d.t==='d')dClick(1);
+else if(d.t==='s'&&(G.drawn||G.chain)){if(G.chain)fin();else{G.busy=true;advance(1)}}}
+function handleLeft(nr){const al=new Set(room.peers().map(p=>p.peer));let ch=0;
+G.P.forEach(p=>{if(!p.bot&&p.peer&&!al.has(p.peer)){const o=p.name;p.bot=true;p.name=o+' 🤖';wins[p.name]=wins[o]||0;ch=1}});
+if(ch&&!nr&&G.over==null&&G.P[G.cur].bot&&!G.busy&&!G.pend){G.msg='ผู้เล่นหลุด — บอทเล่นแทน';begin()}}
+function checkHost(){if(!G||!G.online||G.host||!hostPeer)return;const al=new Set(room.peers().map(p=>p.peer));if(al.has(hostPeer))return;
+const c=G.P.find(p=>p.peer&&p.peer!==hostPeer&&!p.bot&&al.has(p.peer));if(c&&c.peer===myPeer())promote()}
+function promote(){isHost=true;G.host=1;G.ep=(G.ep||0)+1;hostPeer=myPeer();room.presence({host:1});clearInterval(tm);tm=setInterval(()=>{if(isHost&&G)bcast()},3000);
+handleLeft(1);G.busy=false;if(G.over!=null)render();else if(G.pend)advance(G.pend);else begin()}
+function newOnline(){const ps=seats().slice(0,7);const nb=Math.min(botsN,7-ps.length);if(ps.length+nb<2)return;const used=[];
+const P=ps.map((p,i)=>{let n=String(p.presence.name||'ผู้เล่น').slice(0,12);if(used.includes(n))n+=' '+(i+1);used.push(n);return{name:n,bot:false,h:[],peer:p.peer}});for(let k=1;k<=nb;k++)P.push({name:'บอท '+k,bot:true,h:[]});newGame(P)}
+function lobby(er){
+app.innerHTML=`<h1>🌐 เล่นออนไลน์</h1><p class="sub">เล่นพร้อมกันคนละเครื่อง 2–7 คน</p><div class="panel"><b>ชื่อของคุณ</b><div class="row"><input id="nm" maxlength="12" value="${esc(cfg[0].n)}"></div><button class="btn" style="width:100%" id="mk">สร้างห้องใหม่</button><p class="sub" style="margin:14px 0 4px">หรือใส่รหัสห้องที่เพื่อนแจ้ง</p><div class="row"><input id="cd" maxlength="4" inputmode="numeric" placeholder="รหัส 4 หลัก"><button class="btn sm" id="jn">เข้าห้อง</button></div><p class="sub" id="er" style="color:#ffb3b3">${er||''}</p><button class="btn ghost" style="width:100%" id="bk">กลับ</button></div>`;
+$('#mk').onclick=()=>enter(1);$('#jn').onclick=()=>enter(0);$('#bk').onclick=setup}
+async function enter(h){const name=($('#nm').value||'ผู้เล่น').trim().slice(0,12);cfg[0].n=name;
+const code=h?String(1000+Math.floor(Math.random()*9000)):$('#cd').value.trim();
+if(!/^\d{4}$/.test(code))return lobby('รหัสต้องเป็นตัวเลข 4 หลัก');
+wantHost=!!h;let R0=null;try{R0=window.claude&&await claude.use('room')}catch(e){}
+if(!R0&&!window.claude&&window.Peer){R0=p2pRoom();p2p=true}
+if(!R0)return lobby('ใช้ห้องออนไลน์ไม่ได้ — ต้องเปิดผ่านลิงก์ที่เจ้าของแชร์ให้ และล็อกอิน claude.ai ก่อน');
+try{room=await R0.join('uno-'+code)}catch(e){const t=e&&e.type;return lobby(t==='unavailable-id'?'รหัสนี้ถูกใช้อยู่แล้ว กดสร้างห้องใหม่อีกครั้ง':t==='peer-unavailable'?'ไม่พบห้องรหัสนี้ ตรวจรหัส และให้เจ้าของห้องสร้างห้องก่อน':'เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่')}
+isHost=!!h;rc=code;G=null;
+room.on('st',onSt);room.on('act',onAct);
+room.onPeers(()=>{if(!G){if(!(document.activeElement&&document.activeElement.id==='mn'))lobbyView()}else if(isHost){handleLeft();bcast()}else if(!p2p)checkHost()});
+await room.presence({name,host:h?1:0});
+clearInterval(tm);tm=setInterval(()=>{if(isHost&&G)bcast()},3000);ready=false;setTimeout(()=>{ready=true;if(!G&&room)lobbyView()},1500);lobbyView()}
+function lobbyView(){const ps=seats();const f=ps[0],mh=!!(f&&f.isMe&&f.sameTab&&(isHost||f.presence.host||ready));const was=isHost;isHost=mh;if(mh&&!was&&!f.presence.host)room.presence({host:1});botsN=Math.min(botsN,7-ps.length);const nb=botsN;
+app.innerHTML=`<h1>🌐 ห้อง ${rc}</h1><p class="sub">ให้เพื่อนเปิดเกมนี้ กด “เล่นออนไลน์” แล้วใส่รหัส <b style="color:var(--gold);font-size:22px">${rc}</b></p><div class="panel"><b>ชื่อของคุณ (แก้ได้ก่อนเริ่มเกม)</b><div class="row"><input id="mn" maxlength="12" value="${esc(cfg[0].n)}"></div><b>ผู้เล่นในห้อง (${ps.length+nb}/7)</b>${ps.map(p=>`<div class="row">${p.presence.host?'👑':'🙂'} ${esc(p.presence.name||'ผู้เล่น')}${p.isMe&&p.sameTab?' (คุณ)':''}</div>`).join('')}${Array.from({length:nb},(_,k)=>`<div class="row">🤖 บอท ${k+1}</div>`).join('')}${isHost?`<div class="row"><button class="btn sm ghost" id="ba" style="flex:1">＋ เพิ่มบอท</button><button class="btn sm ghost" id="br" style="flex:1">－ ลดบอท</button></div><button class="btn ghost" style="width:100%" id="mu">ลงไพ่ใบเดียวกันหลายใบ: ${multi?'เปิด ✓':'ปิด'}</button><button class="btn" style="width:100%;margin-top:8px" id="st"${ps.length+nb<2?' disabled':''}>เริ่มเกม</button>`:'<p class="sub">รอเจ้าของห้องกดเริ่มเกม…</p>'}<button class="btn ghost" style="width:100%;margin-top:8px" id="bk">ออกจากห้อง</button></div>`;
+$('#mn').onchange=e=>{cfg[0].n=e.target.value.trim().slice(0,12)||'ผู้เล่น';room.presence({name:cfg[0].n});lobbyView()};
+if(isHost){$('#st').onclick=newOnline;$('#ba').onclick=()=>{botsN=Math.min(7-seats().length,botsN+1);lobbyView()};$('#br').onclick=()=>{botsN=Math.max(0,botsN-1);lobbyView()};$('#mu').onclick=()=>{multi=!multi;lobbyView()}}$('#bk').onclick=leave}
+function hostLost(){leave();lobby('เจ้าของห้องออกจากเกมแล้ว — ห้องปิด')}
+function p2pRoom(){return{join:name=>new Promise((res,rej)=>{
+const hid='unonight-th-'+name.replace('uno-',''),peers=new Map(),hs={},ph=[],conns=new Map();let me,pr,hc,closed=false,done=false;
+const fail=e=>{if(!done){done=true;try{pr.destroy()}catch(x){}rej(e)}};
+const view=()=>[...peers.values()].map(p=>({peer:p.peer,isMe:p.peer===me,sameTab:p.peer===me,kind:'viewer',guest:false,presence:p.presence||{}}));
+const fire=()=>{const v=view();ph.forEach(f=>f({peers:v,joined:[],left:[],updated:[]}))};
+const deliver=(t,d,from)=>(hs[t]||[]).forEach(f=>f({topic:t,data:d,peer:from,isMe:from===me,sameTab:from===me,kind:'viewer',guest:false}));
+const sendAll=(o,ex)=>conns.forEach((c,id)=>{if(id!==ex&&c.open)c.send(o)});
+const push=()=>{sendAll({k:'peers',list:[...peers.values()]});fire()};
+const api={name,
+emit:async(t,d)=>{if(wantHost)sendAll({k:'ev',t,d,from:me});else if(hc&&hc.open)hc.send({k:'ev',t,d})},
+on:(t,f)=>{(hs[t]=hs[t]||[]).push(f);return()=>{}},
+presence:async patch=>{const p=peers.get(me);p.presence={...p.presence,...patch};if(wantHost)push();else if(hc&&hc.open)hc.send({k:'pres',patch});fire()},
+peers:()=>view(),onPeers:f=>{ph.push(f)},leave:async()=>{closed=true;try{pr.destroy()}catch(x){}}};
+const to=setTimeout(()=>fail({type:'timeout'}),10000);
+const ok=()=>{if(!done){done=true;clearTimeout(to);res(api)}};
+if(wantHost){pr=new Peer(hid);pr.on('error',fail);
+pr.on('open',id=>{me=id;peers.set(me,{peer:me,presence:{}});ok()});
+pr.on('connection',c=>{c.on('open',()=>{conns.set(c.peer,c);peers.set(c.peer,{peer:c.peer,presence:{}});push()});
+c.on('data',m=>{if(!m)return;if(m.k==='ev'){deliver(m.t,m.d,c.peer);sendAll({k:'ev',t:m.t,d:m.d,from:c.peer},c.peer)}else if(m.k==='pres'){const p=peers.get(c.peer);if(p){p.presence={...p.presence,...m.patch};push()}}});
+c.on('close',()=>{conns.delete(c.peer);peers.delete(c.peer);push()})})}
+else{pr=new Peer();pr.on('error',e=>{if(!done)fail(e)});
+pr.on('open',id=>{me=id;peers.set(me,{peer:me,presence:{}});hc=pr.connect(hid,{reliable:true});
+hc.on('open',ok);
+hc.on('data',m=>{if(!m)return;if(m.k==='peers'){peers.clear();m.list.forEach(p=>peers.set(p.peer,p));fire()}else if(m.k==='ev')deliver(m.t,m.d,m.from)});
+hc.on('close',()=>{if(!closed)hostLost()})})}
+})}}
+function nameScreen(){let sv='';try{sv=localStorage.getItem('uno_name')||''}catch(e){}
+app.innerHTML=`<h1>🃏 ยูโน่ ไนท์</h1><p class="sub">ตั้งชื่อของคุณก่อนเริ่มเล่น</p><div class="panel"><div class="row"><input id="n0" maxlength="12" placeholder="พิมพ์ชื่อ เช่น ฟ้า" value="${esc(sv)}"></div><button class="btn" style="width:100%" id="ok0">ตกลง</button></div>`;
+const go=()=>{const v=$('#n0').value.trim();if(!v){$('#n0').focus();return}cfg[0].n=v.slice(0,12);named=true;try{localStorage.setItem('uno_name',cfg[0].n)}catch(e){}setup()};
+$('#ok0').onclick=go;$('#n0').onkeydown=e=>{if(e.key==='Enter')go()};$('#n0').focus()}
+nameScreen();
+</script>
+</body>
+</html>
